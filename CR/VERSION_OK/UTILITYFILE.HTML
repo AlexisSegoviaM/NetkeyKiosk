@@ -1,0 +1,455 @@
+<HTML>
+<HEAD>
+<TITLE>
+	Netkey Creator Utility File
+</TITLE>
+
+<SCRIPT LANGUAGE="JAVASCRIPT" SRC="scripts/common.js"></SCRIPT>
+<SCRIPT LANGUAGE="JAVASCRIPT" SRC="scripts/printer.js"></SCRIPT>
+<SCRIPT LANGUAGE="JAVASCRIPT" SRC="scripts/cardreader.js"></SCRIPT>
+<SCRIPT LANGUAGE="JAVASCRIPT" SRC="scripts/webprint.js"></SCRIPT>
+<SCRIPT LANGUAGE="JAVASCRIPT" SRC="scripts/promotion.js"></SCRIPT>
+<SCRIPT LANGUAGE="JAVASCRIPT" SRC="scripts/errorcontrol.js"></SCRIPT>
+
+<SCRIPT LANGUAGE="JAVASCRIPT">
+
+	// Variables de configuracion de la interface
+
+	var kioskCountry;
+	var baseurl;
+	var sucurl;
+	var baseLocation;
+	var debug;
+	var promotionEnabled;
+
+
+	function Initialize() {
+
+		 kioskCountry = "CR";
+		 baseurl = "https://#.kioskos.redbac.com/kiosk/";
+		 sucurl = "https://www.sucursalelectronica.com/redir/showLogin.go?country=CR";
+		 debug = false;
+		 promotionEnabled = false;
+		 baseLocation = "";
+
+		try {
+
+			window.Netkey_Document.Object = window.external.Document;
+			window.operation_RepeatedTransfer.Object = window.external.Document.Screens("RepeatedTransfer").Children("operation_RepeatedTransfer");
+			window.operation_NoTransferAccounts.Object = window.external.Document.Screens("NoTransferAccounts").Children("operation_NoTransferAccounts");
+			window.operation_KioskPantallaNormal.Object = window.external.Document.Screens("KioskPantallaNormal").Children("operation_KioskPantallaNormal");
+			window.operation_RepeatedPayment.Object = window.external.Document.Screens("RepeatedPayment").Children("operation_RepeatedPayment");
+			window.operation_BadLastStatement.Object = window.external.Document.Screens("BadLastStatement").Children("operation_BadLastStatement");
+			window.operation_NoCreditCards.Object = window.external.Document.Screens("NoCreditCards").Children("operation_NoCreditCards");
+			window.operation_NoAccounts.Object = window.external.Document.Screens("NoAccounts").Children("operation_NoAccounts");
+			window.operation_NoProducts.Object = window.external.Document.Screens("NoProducts").Children("operation_NoProducts");
+			window.operation_OutOfService.Object = window.external.Document.Screens("OutOfService").Children("operation_OutOfService");
+			window.operation_NoPaper.Object = window.external.Document.Screens("NoPaper").Children("operation_NoPaper");
+			window.KioskPantallaNormal_browser.Object = window.external.Document.Screens("KioskPantallaNormal").Children("KioskPantallaNormal_browser");
+			window.BACOnline_browser.Object = window.external.Document.Screens("BACOnline").Children("BACOnline_browser");
+			window.baconline_KioskPantallaNormal.Object = window.external.Document.Screens("KioskPantallaNormal").Children("baconline_KioskPantallaNormal");
+			window.baconline_KioskSecureMenuCOM.Object = window.external.Document.Screens("KioskSecureMenuCOM").Children("baconline_KioskSecureMenuCOM");
+			window.baconline_KioskSecureMenuBCO.Object = window.external.Document.Screens("KioskSecureMenuBCO").Children("baconline_KioskSecureMenuBCO");
+			window.baconline_KioskSecureMenuBCO_CC.Object = window.external.Document.Screens("KioskSecureMenuBCO_CC").Children("baconline_KioskSecureMenuBCO_CC");
+			window.baconline_KioskSecureMenuBCO_Marchamo_CC.Object = window.external.Document.Screens("KioskSecureMenuBCO_Marchamo_CC").Children("baconline_KioskSecureMenuBCO_Marchamo_CC");
+			window.salir_BACOnline.Object = window.external.Document.Screens("BACOnline").Children("salir_BACOnline");
+			window.salir_KioskSecureMenuBCO.Object = window.external.Document.Screens("KioskSecureMenuBCO").Children("salir_KioskSecureMenuBCO");
+			window.salir_KioskSecureMenuBCO_CC.Object = window.external.Document.Screens("KioskSecureMenuBCO_CC").Children("salir_KioskSecureMenuBCO_CC");
+			window.salir_KioskSecureMenuCOM.Object = window.external.Document.Screens("KioskSecureMenuCOM").Children("salir_KioskSecureMenuCOM");
+			window.salir_KioskPantallaNormal.Object = window.external.Document.Screens("KioskPantallaNormal").Children("salir_KioskPantallaNormal");
+			window.salir_NoProducts.Object = window.external.Document.Screens("NoProducts").Children("salir_NoProducts");
+			window.salir_NoAccounts.Object = window.external.Document.Screens("NoAccounts").Children("salir_NoAccounts");
+			window.salir_NoCreditCards.Object = window.external.Document.Screens("NoCreditCards").Children("salir_NoCreditCards");
+			window.salir_BadLastStatement.Object = window.external.Document.Screens("BadLastStatement").Children("salir_BadLastStatement");
+			window.salir_OutOfService.Object = window.external.Document.Screens("OutOfService").Children("salir_OutOfService");
+			window.salir_RepeatedPayment.Object = window.external.Document.Screens("RepeatedPayment").Children("salir_RepeatedPayment");
+			window.salir_RepeatedTransfer.Object = window.external.Document.Screens("RepeatedTransfer").Children("salir_RepeatedTransfer");
+			window.salir_NoTransferAccounts.Object = window.external.Document.Screens("NoTransferAccounts").Children("salir_NoTransferAccounts");
+			window.salir_NoPaper.Object = window.external.Document.Screens("NoPaper").Children("salir_NoPaper");
+			window.imprimir_BACOnline.Object = window.external.Document.Screens("BACOnline").Children("imprimir_BACOnline");
+
+		}
+		catch(e){
+			window.external.Document.Log("Custom Script","ERROR","0","INITIALIZATION_ERROR","Error while instantiating nk event listeners","","");
+		}
+
+
+		try {
+
+			// La configuracion fundamental del kiosco se obtiene del nombre de la interface
+
+			// Nombre de la interface
+			strFileNamePath = window.external.Document.FullName;
+
+			// Pais del kiosco
+			kioskCountry = strFileNamePath.substring(strFileNamePath.lastIndexOf('\\')+1);
+			kioskCountry = kioskCountry.substring(kioskCountry,kioskCountry.indexOf('_'));
+			kioskCountry = kioskCountry.toUpperCase();
+
+			// Url de datos del kiosco
+			urlCountry = strFileNamePath.substring(strFileNamePath.lastIndexOf('\\')+1);
+			urlCountry = urlCountry.substring(urlCountry.indexOf('_')+1);
+			urlCountry = urlCountry.substring(0,urlCountry.indexOf('_'));
+			urlCountry = urlCountry.toLowerCase();
+			baseurl = baseurl.substring(0,baseurl.indexOf('#')) + urlCountry + baseurl.substring(baseurl.indexOf('#')+1);
+
+			baseurl = "https://reg.kioskos.redbac.com/kiosk/";
+
+
+			// Url de sucursal electronica.
+			sucurl = sucurl + kioskCountry;
+
+
+			// Url base para los documentos locales
+			loc = window.location.href;
+			baseLocation = loc.substring(0,loc.lastIndexOf('/')+1);
+
+
+		} catch(e) {
+			window.external.Document.Log("Custom Script","ERROR","0","INITIALIZATION_ERROR","Error while initializing constants","","");
+		}
+
+
+		try {
+
+			boundLoginListener();
+
+		}catch(e){
+			window.external.Document.Log("Custom Script","ERROR","0","INITIALIZATION_ERROR","Error while binding initial card listener","","");
+		}
+
+
+	} // Initialize
+
+</SCRIPT>
+
+</HEAD>
+
+
+<BODY onLoad="Initialize()">
+<OBJECT ID="cambioContrasena_KioskSecureMenuBCO" CLASSID="clsid:38E351C9-D342-11D3-BCD5-005004D9C930">
+</OBJECT>
+<OBJECT ID="Netkey_Document" CLASSID="clsid:09AC4418-C846-11D3-BCD0-005004D9C930">
+</OBJECT>
+<OBJECT id="BACOnline_browser" classid="clsid:A6DE62EC-8183-11D3-BC8C-005004D9C930">
+</OBJECT>
+<OBJECT ID="imprimir_BACOnline" CLASSID="clsid:38E351C9-D342-11D3-BCD5-005004D9C930">
+</OBJECT>
+<OBJECT ID="baconline_KioskPantallaNormal" CLASSID="clsid:38E351C9-D342-11D3-BCD5-005004D9C930">
+</OBJECT>
+<OBJECT ID="baconline_KioskSecureMenuCOM" CLASSID="clsid:38E351C9-D342-11D3-BCD5-005004D9C930">
+</OBJECT>
+<OBJECT ID="baconline_KioskSecureMenuBCO" CLASSID="clsid:38E351C9-D342-11D3-BCD5-005004D9C930">
+</OBJECT>
+<OBJECT ID="baconline_KioskSecureMenuBCO_CC" CLASSID="clsid:38E351C9-D342-11D3-BCD5-005004D9C930">
+</OBJECT>
+<OBJECT ID="baconline_KioskSecureMenuBCO_Marchamo_CC" CLASSID="clsid:38E351C9-D342-11D3-BCD5-005004D9C930">
+</OBJECT>
+<OBJECT ID="operation_OutOfService" CLASSID="clsid:38E351C9-D342-11D3-BCD5-005004D9C930">
+</OBJECT>
+<OBJECT ID="operation_NoTransferAccounts" CLASSID="clsid:38E351C9-D342-11D3-BCD5-005004D9C930">
+</OBJECT>
+<OBJECT ID="operation_RepeatedTransfer" CLASSID="clsid:38E351C9-D342-11D3-BCD5-005004D9C930">
+</OBJECT>
+<OBJECT ID="operation_RepeatedPayment" CLASSID="clsid:38E351C9-D342-11D3-BCD5-005004D9C930">
+</OBJECT>
+<OBJECT ID="operation_BadLastStatement" CLASSID="clsid:38E351C9-D342-11D3-BCD5-005004D9C930">
+</OBJECT>
+<OBJECT ID="operation_KioskPantallaNormal" CLASSID="clsid:38E351C9-D342-11D3-BCD5-005004D9C930">
+</OBJECT>
+<OBJECT ID="operation_NoCreditCards" CLASSID="clsid:38E351C9-D342-11D3-BCD5-005004D9C930">
+</OBJECT>
+<OBJECT ID="operation_NoAccounts" CLASSID="clsid:38E351C9-D342-11D3-BCD5-005004D9C930">
+</OBJECT>
+<OBJECT ID="operation_NoProducts" CLASSID="clsid:38E351C9-D342-11D3-BCD5-005004D9C930">
+</OBJECT>
+<OBJECT ID="operation_NoPaper" CLASSID="clsid:38E351C9-D342-11D3-BCD5-005004D9C930">
+</OBJECT>
+<OBJECT ID="salir_BACOnline" CLASSID="clsid:38E351C9-D342-11D3-BCD5-005004D9C930">
+</OBJECT>
+<OBJECT ID="salir_KioskSecureMenuBCO" CLASSID="clsid:38E351C9-D342-11D3-BCD5-005004D9C930">
+</OBJECT>
+<OBJECT ID="salir_KioskSecureMenuBCO_CC" CLASSID="clsid:38E351C9-D342-11D3-BCD5-005004D9C930">
+</OBJECT>
+<OBJECT ID="salir_KioskSecureMenuCOM" CLASSID="clsid:38E351C9-D342-11D3-BCD5-005004D9C930">
+</OBJECT>
+<OBJECT ID="salir_KioskPantallaNormal" CLASSID="clsid:38E351C9-D342-11D3-BCD5-005004D9C930">
+</OBJECT>
+<OBJECT ID="salir_NoProducts" CLASSID="clsid:38E351C9-D342-11D3-BCD5-005004D9C930">
+</OBJECT>
+<OBJECT ID="salir_NoAccounts" CLASSID="clsid:38E351C9-D342-11D3-BCD5-005004D9C930">
+</OBJECT>
+<OBJECT ID="salir_NoCreditCards" CLASSID="clsid:38E351C9-D342-11D3-BCD5-005004D9C930">
+</OBJECT>
+<OBJECT ID="salir_BadLastStatement" CLASSID="clsid:38E351C9-D342-11D3-BCD5-005004D9C930">
+</OBJECT>
+<OBJECT ID="salir_OutOfService" CLASSID="clsid:38E351C9-D342-11D3-BCD5-005004D9C930">
+</OBJECT>
+<OBJECT ID="salir_RepeatedPayment" CLASSID="clsid:38E351C9-D342-11D3-BCD5-005004D9C930">
+</OBJECT>
+<OBJECT ID="salir_RepeatedTransfer" CLASSID="clsid:38E351C9-D342-11D3-BCD5-005004D9C930">
+</OBJECT>
+<OBJECT ID="salir_NoTransferAccounts" CLASSID="clsid:38E351C9-D342-11D3-BCD5-005004D9C930">
+</OBJECT>
+<OBJECT ID="salir_NoPaper" CLASSID="clsid:38E351C9-D342-11D3-BCD5-005004D9C930">
+</OBJECT>
+<OBJECT id="KioskPantallaNormal_browser" classid="clsid:A6DE62EC-8183-11D3-BC8C-005004D9C930">
+</OBJECT>
+
+Netkey Creator Utility File
+
+<!-- APPLET PARA EL LECTOR DE TARJETA -->
+
+<OBJECT classid="clsid:CAFEEFAC-0014-0002-0000-ABCDEFFEDCBA" name="reader" width="50" height="50" id="reader">
+	<param name="code" value="bac.sbe.kiosk.device.cardreader.CardReaderApplet" >
+	<param name="archive" value="APPLETS/APPLET.jar" >
+	<param name="type" value="application/x-java-applet">
+	<param name="scriptable" value="true">
+	<param name="readerEnabled" value="true">
+	<param name="readerClass" value="bac.sbe.kiosk.device.cardreader.kde.KDECardReader">
+	<param name="removeCardSound" value="sound/ding.wav">
+	<param name="imageDailogs" value="3">
+	<param name="imageParamSeparator" value="|">
+	<param name="imageParam1" value="REMOVECARD|img/dialogRemoveYourCard.jpg|132|184">
+	<param name="imageParam2" value="BOLDIALOG|img/dialogNoPaper.jpg|132|184">
+	<param name="imageParam3" value="PRINDIALOG|img/dialogNowPrinting.jpg|132|184">
+	<param name="trace" value="true">
+	<param name="comPort" value="COM2">
+	<param name="baudRate" value="9600">
+	<param name="dataBits" value="8">
+	<param name="stopBits" value="1">
+	<param name="parity" value="3">
+	<param name="timeOut" value="5000">
+	<param name="retry" value="3">
+	<param name="retryWait" value="1000">
+	<param name="busyPolingInterval" value="20">
+	<param name="availablePolingInterval" value="40">
+	<param name="readMode" value="READ/WAIT">
+	<param name="name" value="bac.sbe.kiosk.device.cardreader.CardReaderApplet">
+	<COMMENT>
+	<EMBED
+	type = "application/x-java-applet" \
+	CODE = "bac.sbe.kiosk.device.cardreader.CardReaderApplet" \
+	ARCHIVE = "APPLETS/APPLET.jar" \
+	WIDTH = "50" \
+	HEIGHT = "50" \
+	scriptable = "true" >
+	<NOEMBED>
+	alt="Browser no corre el applet"
+	Browser no tiene soporte para applets
+	</NOEMBED>
+	</EMBED>
+	</COMMENT>
+</OBJECT>
+
+<!-- APPLET PARA LA IMPRESORA -->
+
+<OBJECT classid="clsid:CAFEEFAC-0014-0002-0000-ABCDEFFEDCBA" name="printer" width="50" height="50" id="printer">
+	<param name="code" value="bac.sbe.kiosk.device.printer.PrinterApplet" >
+	<param name="archive" value="applets/applet.jar" >
+	<param name="type" value="application/x-java-applet">
+	<param name="scriptable" value="true">
+	<param name="trace" value="false">
+	<param name="fontSize" value="7">
+	<param name="font" value="Lucida Console">
+	<param name="border" value="15">
+	<param name="tableGap" value="40">
+	<param name="rowHeight" value="1">
+	<param name="paperDetectionEnabled" value="true">
+	<param name="port" value="7">
+	<param name="idQuery" value="REG QUERY HKLM\Software\Netkey\AKM\Options\ /v KioskID">
+	<param name="name" value="bac.sbe.kiosk.device.printer.PrinterApplet">
+	<COMMENT>
+	<EMBED
+	type = "application/x-java-applet" \
+	CODE = "bac.sbe.kiosk.device.printer.PrinterApplet" \
+	ARCHIVE = "applets/applet.jar" \
+	WIDTH = "50" \
+	HEIGHT = "50" \
+	scriptable = "true" >
+	<NOEMBED>
+	alt="Browser no corre el applet"
+	Browser no tiene soporte para applets
+	</NOEMBED>
+	</EMBED>
+	</COMMENT>
+</OBJECT>
+<br>
+Pruebas
+<br>
+<hr>
+<input type="button" value="Probar Sonido" onClick="document.reader.startSound();">
+<hr>
+<input type="button" value="Detener Sonido" onClick="document.reader.stopSound();">
+<hr>
+<input type="button" value="Identificador de Kiosco" onClick="alert(document.printer.getKioskId());">
+<hr>
+<input type="button" value="Imprimir prueba de papel" onClick="printTest();">
+<hr>
+<input type="button" value="Tiene papel" onClick="alert( (getPaperStatus() == PAPERSTATUS_NORMAL || getPaperStatus() == PAPERSTATUS_NEAREND) ? 'SI' : 'NO' );">
+<hr>
+<input type="button" value="Numero de Status" onClick="alert( getPaperStatus() );">
+<hr>
+<input type="button" value="Problemas para detectar papel" onClick="alert( ( getPaperStatus() == PAPERSENSOR_ERROR) ? 'SI':'NO' );">
+<hr>
+<input type="button" value="Mostrar Dialogo" onClick="document.reader.showDialog('BOLDIALOG'); setTimeout('document.reader.hideDialog(\'BOLDIALOG\')',500);">
+<hr>
+
+<!-- Componente para la impresion de paginas web   -->
+<OBJECT name="printerOcx" id="printerOcx" style="LEFT: 0px; WIDTH: 100px; TOP: 0px; HEIGHT: 43px" height=43
+	width=167 classid="clsid:2DB0E349-9E6E-44AE-8FC9-D3199166580E">
+	<SPAN STYLE="color:red">ActiveX</SPAN>
+</OBJECT>
+<!-- Flash para el sonido de entrada | sound.Play() -->
+<object classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000" name="sound" width="490" height="59" align="middle" id="sound">
+	<param name="movie" value="flash/sound.swf">
+	<param name="BGCOLOR" value="#CCCCCC">
+</object>
+<!-- Eventos para buscadores internet explorer -->
+<SCRIPT FOR="KioskPantallaNormal_browser" EVENT="BeforeNavigate2(oFrame , sURL , Flags , TargetFrameName , PostData , Headers , oResponse)">
+	preCheck(sURL);
+</SCRIPT>
+<SCRIPT FOR="KioskPantallaNormal_browser" EVENT="DocumentComplete(oFrame , sURL)">
+	check(sURL);
+</SCRIPT>
+<SCRIPT FOR="BACOnline_browser" EVENT="BeforeNavigate2(oFrame , sURL , Flags , TargetFrameName , PostData , Headers , oResponse)">
+	preCheckBacOnline(oFrame , sURL , Flags , TargetFrameName , PostData , Headers , oResponse);
+</SCRIPT>
+<SCRIPT FOR="BACOnline_browser" EVENT="DocumentComplete(oFrame , sURL)">
+	checkBacOnline(oFrame, sURL);
+</SCRIPT>
+
+
+<!-- Botones BACOnline -->
+<SCRIPT FOR="baconline_KioskSecureMenuBCO"
+	 EVENT="OnClick()">
+	onBacOnlineButtonPress();
+</SCRIPT>
+<SCRIPT FOR="baconline_KioskSecureMenuBCO_CC"
+	 EVENT="OnClick()">
+	onBacOnlineButtonPress();
+</SCRIPT>
+<SCRIPT FOR="baconline_KioskSecureMenuBCO_Marchamo_CC"
+	 EVENT="OnClick()">
+	onBacOnlineButtonPress();
+</SCRIPT>
+<SCRIPT FOR="baconline_KioskSecureMenuCOM"
+	 EVENT="OnClick()">
+	onBacOnlineButtonPress();
+</SCRIPT>
+<SCRIPT FOR="baconline_KioskPantallaNormal"
+	 EVENT="OnClick()">
+	onBacOnlineButtonPress();
+</SCRIPT>
+
+<!-- Botones Menu -->
+<SCRIPT FOR="operation_KioskPantallaNormal"
+	 EVENT="OnClick()">
+	if (!transaction) {
+		goToMenu();
+	}
+</SCRIPT>
+<SCRIPT FOR="operation_OutOfService"
+	EVENT="OnClick()">
+	goToMenu();
+</SCRIPT>
+<SCRIPT FOR="operation_NoProducts"
+	 EVENT="OnClick()">
+	goToMenu();
+</SCRIPT>
+<SCRIPT FOR="operation_NoAccounts"
+	 EVENT="OnClick()">
+	goToMenu();
+</SCRIPT>
+<SCRIPT FOR="operation_NoCreditCards"
+	 EVENT="OnClick()">
+	goToMenu();
+</SCRIPT>
+<SCRIPT FOR="operation_BadLastStatement"
+	 EVENT="OnClick()">
+	goToMenu();
+</SCRIPT>
+<SCRIPT FOR="operation_RepeatedPayment"
+	 EVENT="OnClick()">
+	goToMenu();
+</SCRIPT>
+<SCRIPT FOR="operation_RepeatedTransfer"
+	 EVENT="OnClick()">
+	goToMenu();
+</SCRIPT>
+<SCRIPT FOR="operation_NoTransferAccounts"
+	 EVENT="OnClick()">
+	goToMenu();
+</SCRIPT>
+<SCRIPT FOR="operation_NoPaper"
+	 EVENT="OnClick()">
+	goToMenu();
+</SCRIPT>
+<!-- Botones Salir -->
+<SCRIPT FOR="salir_BACOnline"
+	 EVENT="OnClick()">
+ 	onExitButtonPressed();
+</SCRIPT>
+<SCRIPT FOR="salir_KioskSecureMenuBCO"
+	 EVENT="OnClick()">
+	 onExitButtonPressed();
+</SCRIPT>
+<SCRIPT FOR="salir_KioskSecureMenuBCO_CC"
+	 EVENT="OnClick()">
+	 onExitButtonPressed();
+</SCRIPT>
+<SCRIPT FOR="salir_KioskSecureMenuCOM"
+	 EVENT="OnClick()">
+	 onExitButtonPressed();
+</SCRIPT>
+<SCRIPT FOR="salir_KioskPantallaNormal"
+	 EVENT="OnClick()">
+	 onExitButtonPressed();
+</SCRIPT>
+<SCRIPT FOR="salir_NoProducts"
+	 EVENT="OnClick()">
+	 onExitButtonPressed();
+</SCRIPT>
+<SCRIPT FOR="salir_NoAccounts"
+	 EVENT="OnClick()">
+	 onExitButtonPressed();
+</SCRIPT>
+<SCRIPT FOR="salir_NoCreditCards"
+	 EVENT="OnClick()">
+	 onExitButtonPressed();
+</SCRIPT>
+<SCRIPT FOR="salir_BadLastStatement"
+	 EVENT="OnClick()">
+	 onExitButtonPressed();
+</SCRIPT>
+<SCRIPT FOR="salir_OutOfService"
+	 EVENT="OnClick()">
+	 onExitButtonPressed();
+</SCRIPT>
+<SCRIPT FOR="salir_RepeatedPayment"
+	 EVENT="OnClick()">
+	 onExitButtonPressed();
+</SCRIPT>
+<SCRIPT FOR="salir_RepeatedTransfer"
+	 EVENT="OnClick()">
+	 onExitButtonPressed();
+</SCRIPT>
+<SCRIPT FOR="salir_NoTransferAccounts"
+	 EVENT="OnClick()">
+	 onExitButtonPressed();
+</SCRIPT>
+<SCRIPT FOR="salir_NoPaper"
+	 EVENT="OnClick()">
+	 onExitButtonPressed();
+</SCRIPT>
+
+<!-- Botones Imprimir -->
+<SCRIPT FOR="imprimir_BACOnline" EVENT="OnClick()">
+	printBacOnLine();
+</SCRIPT>
+<!-- Eventos principales -->
+<SCRIPT FOR="Netkey_Document"  EVENT="ScreenSwitchComplete(oCurrentScreen , oPreviousScreen)">
+	onScreenSwitch(oCurrentScreen.Name,oPreviousScreen.Name);
+</SCRIPT>
+</BODY>
+</HTML>

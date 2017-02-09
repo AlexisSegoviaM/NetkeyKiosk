@@ -1,0 +1,69 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+
+<script language="JavaScript" src="../scripts/screenutils.js"></script>
+<script language="JavaScript" src="../scripts/promotion_screen.js"></script>
+<script language="JavaScript" event="FSCommand (command, args)" for="progreso">
+		if (command == "complete"){
+			hideProgress();
+		}
+</script>
+
+<style type="text/css">
+<!--
+code {
+	font-family: "TheSans BAC", Verdana, sans-serif;
+	font-size: 48px;
+	font-weight: bold;
+	color: #990000;
+}
+.sizecero {
+	height: 0px;
+	width: 0px;
+}
+-->
+</style>
+<link href="kiosk.css" rel="stylesheet" type="text/css">
+</head>
+<BODY bgcolor="#CCCCCC" class="clearBody">
+<table width="100%" height="100%" border="0" cellpadding="0" cellspacing="0">
+  <tr valign="middle">
+    <td height="20" align="left">
+</td>
+  </tr>
+
+  <tr valign="middle">
+    <td align="center">
+<p class="messageFontBlack"><span class="messageFontBlack2">&iexcl;Felicidades!<br>
+        </span><span class="messageFontBlack2">usted ha sido registrado en
+        nuestra promoci&oacute;n</span></p>
+      <p class="messageFontBlack">
+        &quot;Gane con los kioscos de BAC San Jos&eacute;&quot;</p>
+      <p class="messageFontBlack">
+        <span class="messageFontBlack2">Fecha del sorteo 24 de Noviembre del 2004</span>
+</p>
+      </td>
+  </tr>
+    <tr>
+    <td height="100" align="center" valign="middle">
+      <p><h3 id="progressBar">&nbsp;</h3></p>
+	 </td>
+  </tr>
+  <tr>
+    <td height="120" align="center" valign="bottom">
+		<input name="button1" type="image" id="button1" onMouseDown="button1_onMouseDown()" onMouseUp="button1_onMouseUp()"  onMouseOut="button1_onMouseUp()" onFocus="this.blur()" src="../img/comprobante_normal.gif" width="284" height="120">
+	   </td>
+  </tr>
+  <tr>
+    <td height="100" align="right" valign="bottom"><p class="messageFontSmall">aplican restricciones</p></td>
+  </tr>
+</table>
+</body>
+</html>
+
+
+
+
+

@@ -1,0 +1,242 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+<HEAD>
+<META http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<META name="GENERATOR" content="IBM WebSphere Studio">
+<link href="kiosk.css" rel="stylesheet" type="text/css">
+<SCRIPT LANGUAGE="JavaScript" SRC="../scripts/screenutils.js"></SCRIPT>
+<SCRIPT LANGUAGE="JavaScript" SRC="../scripts/validation.js"></SCRIPT>
+<script language="JavaScript">
+
+	var submitUsed = false;
+	var dataSent = false;
+
+	// Inicializacion
+	function init(){
+		document.loginForm.country.value = getCountry();
+		document.loginForm.action = getFormAction();
+		document.loginForm.user.focus();
+		var country= getCountry();
+		if (country.length>0){
+			var exchangeRateDiv= document.getElementById("exchangeRateDiv");
+			flashHTML="<object type='application/x-shockwave-flash' data='../flash/exchangeRateK.swf?UICountry="+country+"' width='520' height='50'>	<param name='movie' value='../flash/exchangeRateK.swf?UICountry="+country+"' /><param name='bgcolor' value='#c9c9c9' /><param name='quality' value='high' /></object>";			
+			exchangeRateDiv.innerHTML= flashHTML;
+		}
+	}
+
+		function userOnBlur(){
+
+			document.loginForm.user.className='sucinput';
+			document.loginForm.password.focus();
+
+		}
+
+		function userOnFocus(){
+
+			document.loginForm.user.className='sucinput_over';
+			submitUsed = true;
+
+		}
+
+		function passwordOnBlur(){
+
+			document.loginForm.password.className='sucinput';
+			document.loginForm.user.focus();
+
+
+		}
+
+		function passwordOnFocus(){
+
+			document.loginForm.password.className='sucinput_over';
+			submitUsed = true;
+
+		}
+
+
+
+		function validate(){
+
+			submitUsed = true;
+
+			if (!dataSent){
+
+				setError(" ");
+				frm = document.loginForm;
+
+				if (!validateTextField(frm.user.value)){
+					frm.user.value = "";
+					setError("Digite su usuario en minúscula");
+					frm.user.focus();
+					return false;
+				}
+
+				if (frm.user.value.length < 3){
+					setError("Digite 3 caracteres mínimo en el campo usuario");
+					frm.user.focus();
+					return false;
+				}
+
+				var checkOK = "abcdefghijklmnñopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZÑ" + "0123456789";
+				var checkStr = frm.user.value;
+
+				var allValid = true;
+				for (i = 0; i < checkStr.length; i++) {
+					ch = checkStr.charAt(i);
+					for (j = 0; j < checkOK.length; j++)
+					  if (ch == checkOK.charAt(j))
+						break;
+					if (j == checkOK.length) {
+					  allValid = false;
+					  break;
+					}
+				}
+
+				if (!allValid) {
+					setError("El usuario tiene caracteres inválidos");
+					//frm.user.value = "";
+					frm.user.focus();
+					return false;
+				}
+
+				if (containsUpperCase(checkStr)) {
+					setError("El usuario debe indicarse en minúscula");
+					//frm.user.value = "";
+					frm.user.focus();
+					return false;
+				}
+
+				var checkNum = "0123456789";
+				if (checkNum.indexOf(checkStr.charAt(0)) != -1){
+					setError("El campo usuario tiene formato incorrecto");
+					//frm.user.value = "";
+					frm.user.focus();
+					frm.user.select();
+					return (false);
+				}
+
+				if (!validateTextField(frm.password.value)){
+					frm.password.value = "";
+					setError("Digite su contraseña");
+					frm.password.focus();
+					return false;
+				}
+
+				if (frm.password.value.length < 6){
+					setError("La contraseña debe tener mínimo 6 y máximo 16 caracteres");
+					frm.password.value = "";
+					frm.password.focus();
+					frm.password.select();
+					return false;
+				}
+
+				datasent = true;
+				getUtility().setCredential(frm.user.value);
+				getUtility().setLoginType("SEC_LOGIN");
+
+				document.loginForm.kioskId.value = getUtility().printer.getKioskId();
+
+				return true;
+
+			}
+
+			return false;
+
+		}
+
+</script>
+</HEAD>
+<BODY bgcolor="#CCCCCC" class="body" onload="init()">	  	
+	<div id="exchangeRateDiv" class="exchangeRateSection">
+	</div>
+  <table width="100%" height="100%" border="0" cellpadding="2" cellspacing="2">
+    <tr>
+      <td height="80" align="left">
+
+<!-- <p class="messageFont">&nbsp;&nbsp;&nbsp;Utilice el Teclado:</p> -->
+</td>
+    </tr>
+    <tr>
+      <td height="40" align="center" class="messageFont">
+	 <font color="#990000">
+      <h1 id="label">Utilice el Teclado</h1>
+      </font>
+	  </td>
+    </tr>
+
+    <tr>
+      <td height="300" align="center" valign="middle">
+
+<form name="loginForm" method="POST" action="" onSubmit="return validate();">
+  <input name="loginType" type="hidden" id="loginType" value="SEC">
+  <input name="country" type="hidden" id="country" value="CR">
+  <input name="kioskId" type="hidden" value="">
+
+        <table border="0" align="center" cellpadding="8" cellspacing="0">
+
+          <tr valign="middle">
+
+            <td align="left" valign="top" nowrap class="dc"><strong><font color="#CF1326" size="5" face="TheSans BAC">&gt;
+              Usuario </font></strong></td>
+            <td>
+				<input name="user" type="text" class="sucinput" tabindex="1" maxlength="50" onBlur="userOnBlur()" onFocus="userOnFocus()" onKeyPress="clearMe(this)"></td>
+          </tr>
+
+          <tr>
+
+            <td height="30" colspan="2">&nbsp;</td>
+          </tr>
+
+          <tr valign="middle">
+
+            <td align="left" valign="bottom" class="dc"><font color="#CF1326" size="5" face="TheSans BAC"><strong>&gt;
+              Contraseña</strong></font></td>
+            <td align="right">
+				<input name="password" type="password" maxlength="16" class="sucinput" tabindex="2" onBlur="passwordOnBlur()" onFocus="passwordOnFocus()" onKeyPress="clearMe(this)">
+            </td>
+          </tr>
+
+          <tr align="center">
+
+            <td colspan="2"></td>
+          </tr>
+
+          <tr align="center">
+            <td height="30" colspan="2">&nbsp;</td>
+          </tr>
+          <tr align="center">
+
+            <td colspan="2"> <input name="buttonsubmit" type="image" id="buttonsubmit" onMouseOut="buttonsubmit_onMouseUp()" onMouseDown="buttonsubmit_onMouseDown()" onMouseUp="buttonsubmit_onMouseUp()"  src="../img/ingresarbuttonsmall_normal.jpg"></td>
+          </tr>
+        </table>
+
+		</form>
+
+      </td>
+    </tr>
+    <tr>
+
+    <td height="70" align="center">
+		<h2 id="error" class="error">&nbsp;</h2>
+        </td>
+    </tr>
+    <tr>
+
+    <td align="right" valign="bottom"><a href="login.html"><img src="../img/salirbuttonsmall_normal.jpg" width="145" height="59" border="0"></a>
+
+      </td>
+    </tr>
+  </table>
+
+
+
+<!--
+
+<script language="JavaScript" event="FSCommand (command, args)" for= "salir">
+	if (command == 'pressed'){
+		window.location.href = "login.html";
+	}
+</script>
+-->
+</BODY>
+</HTML>

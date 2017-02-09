@@ -1,0 +1,49 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+<HEAD>
+<style type="text/css">
+<!--
+code {
+	font-family: "TheSans BAC", Verdana, sans-serif;
+	font-size: 28px;
+	font-weight: bold;
+	color: #CF1326;
+}
+-->
+</style>
+<SCRIPT LANGUAGE="JavaScript" SRC="../scripts/screenutils.js"></SCRIPT>
+<script language="JavaScript">
+
+var currentNameSet = "";
+
+function setName(name){
+
+		currentNameSet = "name";
+
+		if (name.length == 0) {
+			str = "";
+		}
+		else{
+			str = "<font size=\"5\" color=\"#000000\" face=\"TheSans BAC, Verdana, sans-serif\"><strong>&nbsp;&nbsp;&nbsp;Bienvenido(a):</strong></font>";
+			str+= "<font size=\"6\" color=\"#CF1326\" face=\"TheSans BAC, Verdana, sans-serif\"><strong>"+name+"</strong></font>"
+		}
+		document.all.name.innerHTML = str;
+}
+
+function init() {
+
+	if (currentNameSet == ""){
+		setName(getUserName());
+	}
+
+}
+
+</script>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1"></HEAD>
+<link href="kiosk.css" rel="stylesheet" type="text/css">
+
+<BODY bgcolor="#CCCCCC" class="gradientSmallBody" onload="init()">
+<p><br>
+   <code id="name"></code></p>
+</BODY>
+</HTML>

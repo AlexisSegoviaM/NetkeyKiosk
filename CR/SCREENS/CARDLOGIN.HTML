@@ -1,0 +1,147 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+<HEAD>
+<META http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<META name="GENERATOR" content="IBM WebSphere Studio">
+<link href="kiosk.css" rel="stylesheet" type="text/css">
+<SCRIPT LANGUAGE="JavaScript" SRC="../scripts/screenutils.js"></SCRIPT>
+<SCRIPT LANGUAGE="JavaScript" SRC="../scripts/validation.js"></SCRIPT>
+<script language="JavaScript">
+
+var dataSent = false;
+
+function init() {
+
+
+	if (getUtility().getCredential() == ""){
+
+		if (getUtility().getTemporaryCredential() == ""){
+
+			window.location.href = "login.html";
+
+		} else {
+
+			getUtility().setCredential(getUtility().getTemporaryCredential());
+			getUtility().setTemporaryCredential("");
+		}
+	}
+
+	document.LoginForm.credential.value = getUtility().getCredential();
+	document.LoginForm.action = getFormAction();
+	document.LoginForm.country.value = getCountry();
+
+	document.LoginForm.password.focus();
+}
+
+function validate() {
+
+	if (!dataSent) {
+		setError(" ");
+		if (!validateTextField(document.LoginForm.password.value)) {
+			setError("Digite un número de clave de acceso");
+			document.LoginForm.password.focus();
+			return false;
+		}
+		if (document.LoginForm.password.value.length < 4) {
+			setError("La clave de acceso debe tener 4 dígitos");
+			document.LoginForm.password.focus();
+			return false;
+		}
+		if (!isValidNumber(document.LoginForm.password.value)) {
+			setError("La clave de acceso tiene caracteres inválidos");
+			document.LoginForm.password.focus();
+			return false;
+		}
+
+		dataSent = true;
+
+		document.LoginForm.kioskId.value = getUtility().printer.getKioskId();
+		getUtility().setCredential(document.LoginForm.credential.value);
+		getUtility().setLoginType("CREDIT_CARD_LOGIN");
+
+		return true;
+	}
+
+	return false;
+}
+
+</script>
+</HEAD>
+<BODY bgcolor="#CCCCCC" class="body" onload="init()">
+<table width="100%" height="100%" border="0" cellpadding="2" cellspacing="2">
+  <tr>
+    <td height="80" align="center" valign="bottom">
+<h1 id="label">Digite la clave de acceso telef&oacute;nico</h1></td>
+  </tr>
+  <tr>
+    <td align="center" valign="top">
+
+  <form name="LoginForm" action="login.do" onSubmit="return validate();" method="POST">
+
+	<input name="loginType" type="hidden" value="PROD">
+	<input name="country" type="hidden" value="">
+	<input name="credential" type="hidden" value="">
+	<input name="kioskId" type="hidden" value="">
+
+        <table border="0" align="center" cellpadding="1" cellspacing="1">
+        <tr>
+          <td align="left" valign="top" class="dc">
+			<font color="#CF1326" size="6" face="TheSans BAC, Verdana, sans-serif">
+			<strong>
+			&gt; Clave
+			  </strong>
+			  </font>
+              </td>
+          <td width="30" align="left" valign="top" class="dc">&nbsp;</td>
+          <td align="center" valign="middle">
+              <input name="password" type="password" class="sucinput_over" onBlur="document.LoginForm.password.focus();" onChange="checkInput(this)" onKeyUp="checkInput(this)" size="8" maxlength="4">
+          </td>
+        </tr>
+        <tr align="center">
+          <td colspan="3">
+
+	            <object classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000" name="numpad" width="232" height="288" id="numpad">
+                <param name="movie" value="../flash/numpad.swf">
+                <param name="quality" value="high">
+              	</object>
+			</td>
+        </tr>
+        <tr align="center">
+		  <td colspan="3">
+              <input name="buttonsubmit" type="image" id="buttonsubmit" onMouseOut="buttonsubmit_onMouseUp()" onMouseDown="buttonsubmit_onMouseDown()" onMouseUp="buttonsubmit_onMouseUp()"  src="../img/ingresarbuttonsmall_normal.jpg">
+			</td>
+        </tr>
+        </table>
+      </form>
+      </td>
+  </tr>
+  <tr>
+    <td height="30" align="center" valign="middle">
+        <h2 id="error" class="error">&nbsp;</h2></td>
+  </tr>
+  <tr>
+    <td height="60" align="right" valign="bottom">
+    <a href="login.html"><img src="../img/salirbuttonsmall_normal.jpg" width="145" height="59" border="0"></a>
+     </td>
+  </tr>
+</table>
+<script language="JavaScript" event="FSCommand(command, args)" for="numpad">
+
+		field = document.LoginForm.password;
+
+		if (args == 'clear'){
+			field.value = '';
+			document.LoginForm.password.focus();
+		}
+		else{
+			if (field.value.length < 4)
+			{
+				field.value = field.value + args;
+			}
+
+			document.LoginForm.password.focus();
+		}
+
+</script>
+</BODY>
+</HTML>
